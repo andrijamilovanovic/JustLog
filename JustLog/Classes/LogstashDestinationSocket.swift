@@ -88,8 +88,14 @@ class LogstashDestinationSocket: NSObject, LogstashDestinationSocketProtocol {
                 let logData = transform(log.1)
                 dispatchGroup.enter()
                 task.write(logData, timeout: self.timeout) { [weak self] error in
+                    
+                    guard let self = self else {
+                        dispatchGroup.leave()
+                        return
+                    }
 
-                    self?.dispatchQueue.async {
+
+                    self.dispatchQueue.async(group: dispatchGroup) {
                         if let error = error {
                             sendStatus[tag] = error
                         }
@@ -100,9 +106,8 @@ class LogstashDestinationSocket: NSObject, LogstashDestinationSocketProtocol {
             task.resume()
 
             dispatchGroup.notify(queue: queue) {
-                task.closeRead()
-                task.closeWrite()
 
+                task.cancel()
                 complete(sendStatus)
             }
         }

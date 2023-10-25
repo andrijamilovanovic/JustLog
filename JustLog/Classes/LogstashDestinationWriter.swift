@@ -37,13 +37,16 @@ class LogstashDestinationWriter {
                 return
             }
             
+            /*
             if shouldLogActivity {
                 status.forEach {
                     Self.printActivity("🔌 <LogstashDestination>, \($0.key) did error: \($0.value.localizedDescription)", shouldLogActivity: shouldLogActivity)
                 }
             }
+             completionHandler(unsentLog, status.first?.value)
+            */
             
-            completionHandler(unsentLog, status.first?.value)
+            completionHandler(unsentLog, nil)
         }
     }
     
